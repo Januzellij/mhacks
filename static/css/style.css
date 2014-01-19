@@ -1,0 +1,31 @@
+/* Put your CSS here */
+.ember-application {
+    margin: 3em;
+}
+
+#percentYes {
+	background-color: green;
+}
+
+#percentNo, #percentYes {
+	height: 4em;
+	display: inline-block;
+}
+
+#percentNo {
+	background-color: red;
+}
+
+#question, #submitQ {
+	display: block;
+	margin-left: 50em;
+}
+
+#question {
+	height: 4em;
+	width: 15em;
+}
+
+#submitQ {
+	margin-top: 5em;
+}

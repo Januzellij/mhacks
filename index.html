@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>NFLPoll</title>
+  <link rel="stylesheet" href="static/css/normalize.css">
+  <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+
+  <input id="Yes" type="button" value="Yes">
+  <input id="No" type="button" value="No">
+
+  <form action="http://crowd.im/api/question.php" method="POST">
+    <textarea id="question" rows="50" cols="50" name=question placeholder="Got a question to ask?"></textarea>
+    <input id="submitQ" type=submit value="Submit Question">
+  </form>
+
+  <script src="static/js/libs/jquery-1.10.2.js"></script>
+  <script src="static/js/app.js"></script>
+</body>
+</html>
