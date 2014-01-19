@@ -1,6 +1,57 @@
 $(document).ready(function(){
 	
 	var api_key = "gtq2s5p4x6qyuxr3wqtmh7qz"
+	var games = [];
+	var gameId = "";
+	var home = "";
+	var homeName = "";
+	var homeScore = "";
+	var away = "";
+	var awayName = "";
+	var awayScore = "";
+	var week = "";
+
+// things to add: make it look pretty, don't send canned requests
+
+function liveData(year, season) {
+
+home = $(games[0]).attr("home");
+		away = $(games[0]).attr("away");
+
+			$.ajax({
+			type: "GET",
+			url: "http://crowd.im/api/livedata.php",
+			data: {
+				year: year,
+				season: season,
+				week: week,
+				away: away,
+				home: home
+			}
+		}).done(function (data, status, xhr){
+			if (data !== "<h1>Not Found</h1>") {
+			$(data).find("team").each(function(){
+				if ($(this).attr("id") === home) {
+					homeName = $(this).attr("name");
+					homeScore = $(this).attr("points");
+				} else {
+					awayName = $(this).attr("name");
+					awayScore = $(this).attr("points");
+				}
+			});
+gameId = $(games[0]).attr("id");
+		
+		if (away !== undefined && home !== undefined) {
+			if (!$("#game").length) {
+			$("<div id=game><p>" + awayName + " at " + homeName + "</p><p>" + home + ":" + homeScore + "</p><p>" + away + ":" + awayScore + "</p></div>").insertAfter( $("#No") );
+		}
+		}
+	}
+		});
+	}
+
+
+
 
 	function gameXML(season, today, month, year) {
 		$.ajax({
@@ -10,29 +61,22 @@ $(document).ready(function(){
 				season: season,
 				year: year
 			}
-		}).done(function(data, status, xhr) {
-			console.log('done');
-			var done = gameFromXML(data, today, month, year);
-			return done;
+		}).done(function (data, status, xhr) {
+			$(data).find("game").each(function(){
+				var gameDate = $(this).attr("scheduled").slice(0, 10);
+				var upYear = parseInt(year) + 1;
+				var yearString = upYear.toString();
+				var currentDate = yearString + "-" + month + "-" + today;
+				if (gameDate === currentDate) {
+					if (games.length === 0) {
+						games.push(this);
+						week = $(this).parent().attr("week");
+					}
+				}
+			});
+			sleep(1000);
+			liveData("2013", "PST");
 		});
-	}
-
-	function gameFromXML(seasonXML, today, month, year) {
-		var games = [];
-		console.log('gameXML');
-		$(seasonXML).find("game").each(function(){
-			var gameDate = $(this).attr("scheduled").slice(0, 10);
-			var upYear = parseInt(year) + 1;
-			var yearString = upYear.toString();
-			var currentDate = yearString + "-" + month + "-" + today;
-			console.log("g " + gameDate);
-			console.log("c " + currentDate);
-			if (gameDate === currentDate) {
-				console.log('yay');
-				games.push(this);
-			}
-		});
-		return games;
 	}
 
 	function sleep(milliseconds) {
@@ -45,13 +89,23 @@ $(document).ready(function(){
 }
 
 	function getCurrentGames() {
-		var preGames = gameXML("PRE", "19", "01", "2014");
-		sleep(1000);
-		var regGames = gameXML("REG", "19", "01", "2014");
-		sleep(1000);
-		var pstGames = gameXML("PST", "19", "01", "2013");
-		sleep(1000);
-		console.log(pstGames.length);
+		gameXML("PRE", "19", "01", "2014");
+		sleep(2000);
+		gameXML("REG", "19", "01", "2014");
+		sleep(2000);
+		gameXML("PST", "19", "01", "2013");
+	}
+
+	function getQuestion() {
+		$.ajax({
+			type: "GET",
+			dataType: "json",
+			url: "http://crowd.im/api/question.php",
+			success: function (data, status, xhr){
+			var question = data["question"];
+			$("<div id=questionDiv><p>" + question.toString() + "</p></div>").insertBefore($("#Yes"));
+		}
+		});
 	}
 
 	function vote(resp) {
@@ -59,12 +113,15 @@ $(document).ready(function(){
 			type: "POST",
 			url: "http://crowd.im/api/vote.php",
 			data: {
-				response: resp
+				response: resp,
+				gameId: gameId
 			},
 			success: function (data, status, xhr) {
 				var percent = data["percent_true"];
 				var remaining = 100 - percent;
-				$("<div id=percentYes style=width:" + percent + "%><p id=percentYesLabel>" + percent + "% of users voted Yes</p></div><div id=percentNo style=width:" + remaining + "%><p id=percentNoLabel>" + remaining + "% of users voted No</p></div>").insertBefore( $("#Yes") );
+				if (!$("#percentYes").length) {
+				$("<div id=wrapper><div id=text>" + percent + "% agree" + "</div><div id=percentYes style=width:" + percent + "%></div><div id=percentNo style=width:" + remaining + "%></div></div>").insertBefore( $(".content") );
+				}
 			}
 		});
 	}
@@ -78,5 +135,5 @@ $(document).ready(function(){
 	});
 
 	getCurrentGames();
+	getQuestion();
 });
-

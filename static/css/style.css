@@ -4,16 +4,16 @@
 }
 
 #percentYes {
-	background-color: green;
+	background-color: #99CC33;
 }
 
 #percentNo, #percentYes {
-	height: 4em;
+	height: 3em;
 	display: inline-block;
 }
 
 #percentNo {
-	background-color: red;
+	background-color: #AE0D0D;
 }
 
 #question, #submitQ {
@@ -28,4 +28,23 @@
 
 #submitQ {
 	margin-top: 5em;
+}
+
+.content {
+	margin: 1.5em;
+}
+
+#wrapper {
+	position: relative;
+}
+
+#text {
+	width: 100%;
+	position: absolute;
+	left: 0;
+	right: 0;
+	text-align: center;
+	color: white;
+	font-size: 1.5em;
+	top: 0.5em;
 }
